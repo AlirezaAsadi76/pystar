@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use app\help;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StatusDoneFactory extends Factory
@@ -29,12 +30,12 @@ class StatusDoneFactory extends Factory
             'description'=>$this->faker->text(),
             'destinationFirstname'=>$this->faker->name(),
             'destinationLastname'=>$this->faker->lastName(),
-            'destinationNumber'=>$this->generateRandomString(16),
+            'destinationNumber'=>help::generateRandomString(16),
             'inquiryDate'=>strval($this->faker->year).strval($this->faker->month).strval($this->faker->dayOfMonth()),
             'inquirySequence'=>random_int(100,10000),
             'inquiryTime'=>strval($this->faker->time('His')),
-            'paymentNumber'=>$this->generateRandomString(16),
-            'refCode'=>$this->generateRandomString(16)
+            'paymentNumber'=>help::generateRandomString(16),
+            'refCode'=>help::generateRandomString(16)
         ];
     }
 }

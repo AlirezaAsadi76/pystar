@@ -27,9 +27,6 @@ class TransactionCollection extends ResourceCollection
                 }
 
             }),
-            'links' => [
-                'self' => 'link-value',
-            ],
 
         ];
     }

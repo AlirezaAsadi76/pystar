@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use app\help;
 use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Resources\TransactionCollection;
 use App\Http\Resources\TransactionDone;
@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 use function PHPUnit\Framework\returnSelf;
@@ -26,11 +27,21 @@ class TransactionController extends Controller
     }
     public function create(CreateTransactionRequest $request)
     {
+
+
         $data='';
         $message_error='';
         $flagestatus=true;
+
         $user=User::all()->where('name','=',$request->sourceFirstName)
         ->where('lastname','=',$request->sourceLastName)->first();
+        // $user=Auth::user();
+
+       if($request->header('Authorization')==help::$request_token)
+       {
+        $flagestatus=false;
+        $message_error=['VALIDATION_ERROR','Source And destination accounts are the same!'];
+       }
        if($request->amount>500000000)
        {
         $flagestatus=false;
@@ -42,7 +53,7 @@ class TransactionController extends Controller
         $message_error=['SERVICE_CALL_ERROR','Minimum amount is 10000 Rials'];
        }
 
-       
+
        if($flagestatus==false)
        {
            $failed=StatusFailed::create([
@@ -53,7 +64,7 @@ class TransactionController extends Controller
        }
        else
        {
-            echo '11111';
+
             $done=StatusDone::create([
             'amount'=>$request->amount,
             'description'=>$request->description,
@@ -64,7 +75,7 @@ class TransactionController extends Controller
             'inquirySequence'=>random_int(100,10000),
             'inquiryTime'=>strval(date('his')),
             'paymentNumber'=>$request->paymentNumber,
-            'refCode'=>$this->generateRandomString(16)
+            'refCode'=>help::generateRandomString(16)
             ]);
             $data=[$done->id,StatusDone::class];
        }
@@ -79,22 +90,14 @@ class TransactionController extends Controller
         'type'=>'paya',
     ]);
     if($flagestatus==false)
-        return new TransactionFailed($transaction->statusable);
+        return response()->json(new TransactionFailed($transaction->statusable),400);
     return new TransactionDone($transaction->statusable);
     }
     public function showTransactions(User $user)
     {
 
-        return new TransactionCollection($user->transactions);
+        return new TransactionCollection($user->transactions()->paginate(25));
     }
-    public function generateRandomString($length = 25) {
-        $characters = '0123456789';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
+
 
 }

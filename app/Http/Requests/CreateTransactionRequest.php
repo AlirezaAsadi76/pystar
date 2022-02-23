@@ -34,10 +34,10 @@ class CreateTransactionRequest extends FormRequest
             'sourceLastName'=>'required',
         ];
     }
-    // public function messages()
-    // {
-    //     return[
-    //         'description.max'=>'شرح انتقال وجه (حداکثر ۳۰ کاراکتر)'
-    //     ];
-    // }
+    public function messages()
+    {
+        return[
+            'description.max'=>'شرح انتقال وجه (حداکثر ۳۰ کاراکتر)'
+        ];
+    }
 }
